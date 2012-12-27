@@ -4,6 +4,7 @@ if ii_current_usb_drives.include? node['ii-usb']['target-device']
   include_recipe 'ii-usb::_mount_and_copy_ubuntu'
   include_recipe 'ii-usb::_create_usb_cache'
   include_recipe 'ii-usb::_configure_grub'
+  include_recipe 'ii-usb::_copy_chef_repo' # this is a hack, refactor me
 else
   log "drives must be one of:"
   log ii_current_usb_drives_text
