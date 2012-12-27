@@ -1,0 +1,17 @@
+#!/bin/sh
+# /root is your installers fs
+# /root/cdrom is the mounted version of the iso file
+# /root/isodevice is the usb we booted from
+# /target now exists!
+# to run this you need 
+# d-i ubiquity/success_command string bash /isodevice/success_command.sh
+# it is picked up by ubiquity when successful
+
+mount -o bind /isodevice /target/mnt
+cp -av /*txt /target/root
+chroot /target dpkg -i /mnt/cache/<%=::File.basename(node['ii-usb']['chef-deb']['src']['cache'])%> > /target/root/chef-install-on-target.txt
+
+# sleep helps me debug 
+sleep 9999
+
+# chroot chef-solo -c /mnt/chef-repo/late-solo.rb

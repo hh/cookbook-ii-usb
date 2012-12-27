@@ -1,0 +1,146 @@
+### Localization
+# Preseeding only locale sets language, country and locale.
+d-i debian-installer/locale string en_US
+# Keyboard selection
+# Disable automatic (interactive) keymap detection
+d-i console-setup/ask_detect boolean false
+d-i keyboard-configuration/layoutcode string us
+
+#Step 6
+ubiquity ubiquity/summary note
+ubiquity ubiquity/reboot boolean true
+
+### Network configuration
+d-i netcfg/get_hostname string laptop
+d-i netcfg/get_domain string training
+
+### Mirror settings
+# d-i mirror/http/mirror select CC.archive.ubuntu.com
+ubiquity languagechooser/language-name select English
+ubiquity countrychooser/shortlist select US
+ubiquity localchooser/supported-locales select un_US.UTF-8
+
+#Settings above are not available for preseed with netboot
+############################################################
+#Settings below are available for preseed with netboot
+
+
+### Clock and time zone setup
+# Controls whether or not the hardware clock is set to UTC.
+d-i clock-setup/utc boolean true
+
+# You may set this to any valid setting for $TZ; see the contents of
+# /usr/share/zoneinfo/ for valid values.
+d-i time/zone string US/Central
+
+# Controls whether to use NTP to set the clock during the install
+d-i clock-setup/ntp boolean true
+
+
+
+### Account setup
+# To create a normal user account.
+d-i passwd/user-fullname string Laptop User
+d-i passwd/username string user
+
+# Normal user's password, either in clear text
+d-i passwd/user-password password user
+d-i passwd/user-password-again password user
+
+# The installer will warn about weak passwords. If you are sure you know
+# what you're doing and want to override it, uncomment this.
+d-i user-setup/allow-password-weak boolean true
+
+# Set to true if you want to encrypt the first user's home directory.
+d-i user-setup/encrypt-home boolean false
+ubiquity  passwd/auto-login boolean true
+
+
+### Partitioning
+
+# if we are using a USB to install, it will ask to unmount it
+d-i ubiquity/partman-skip-unmount boolean true
+# https://bugs.launchpad.net/ubuntu/+source/partman-base/+bug/354573
+d-i partman/unmount_active boolean false
+d-i partman/filter_mounted boolean false
+
+d-i partman-auto/method string regular
+# d-i partman-auto/init_automatically_partition select biggest_free
+
+# You can choose one of the three predefined partitioning recipes:
+# - atomic: all files in one partition
+# - home:   separate /home partition
+# - multi:  separate /home, /usr, /var, and /tmp partitions
+d-i partman-auto/choose_recipe select home
+
+d-i partman/default_filesystem string btrfs
+
+# This makes partman automatically partition without confirmation, provided
+# that you told it what to do using one of the methods above.
+d-i partman/confirm_write_new_label boolean true
+d-i partman/choose_partition select finish
+d-i partman/confirm boolean true
+
+
+### Package selection
+tasksel	tasksel/first	multiselect ubuntu-desktop
+#tasksel tasksel/first multiselect xubuntu-desktop
+
+##Maybe replace parts of our install.txt
+# Individual additional packages to install
+#d-i pkgsel/include string
+# Whether to upgrade packages after debootstrap.
+# Allowed values: none, safe-upgrade, full-upgrade
+#d-i pkgsel/upgrade select none
+
+# Policy for applying updates. May be "none" (no automatic updates),
+# "unattended-upgrades" (install security updates automatically), or
+# "landscape" (manage system with Landscape).
+d-i pkgsel/update-policy select none
+
+### Boot loader installation
+# Grub is the default boot loader (for x86).
+d-i grub-installer/only_debian boolean true
+
+
+
+### Finishing up the installation
+# Avoid that last message about the install being complete.
+d-i finish-install/reboot_in_progress note
+
+### https://lists.ubuntu.com/archives/ubuntu-installer/2007-November/000113.html
+# d-i preseed/early_command string [ -x
+# /root/tmp/override_files/early_command.sh ] &&
+# /root/tmp/override_files/early_command.sh
+
+# ubiquity    ubiquity/success_command string [ -x
+# /vmware/success_command.sh ] && /vmware/success_command.sh
+
+# This command is run immediately before the partitioner starts. It may be
+# useful to apply dynamic partitioner preseeding that depends on the state
+# of the disks (which may not be visible when preseed/early_command runs).
+#d-i partman/early_command \
+#       string debconf-set partman-auto/disk "$(list-devices disk | head -n1)"
+d-i partman/early_command string bash /isodevice/prepartitioning_command.sh
+
+d-i ubiquity/success_command string bash /isodevice/success_command.sh
+# d-i ubiquity/failure_command string 
+
+# This first command is run as early as possible, just after
+# preseeding is read.
+# our installer cow filesystem in under /root
+# our boot media is available under /root/isodevice
+# our cdrom is available under /root/cdrom
+d-i preseed/early_command string /root/isodevice/initramfs_command.sh
+
+
+# The following DOES NOT run under ubiquity:
+# This command is run just before the install finishes, but when there is
+# still a usable /target directory. You can chroot to /target and use it
+# directly, or use the apt-install and in-target commands to easily install
+# packages and run commands in the target system.
+#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh
+# our boot media is available under /isodevice at this point
+d-i preseed/late_command string bash /isodevice/late_command.sh
+
+d-i console-setup/variantcode string dvorak

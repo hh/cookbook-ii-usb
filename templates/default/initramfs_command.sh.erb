@@ -1,0 +1,17 @@
+#!/bin/sh
+# /root is your installers fs
+# /root/cdrom is the mounted version of the iso file
+# /root/isodevice is the usb we booted from
+# to run this you need 
+# d-i preseed/early_command string /root/isodevice/initramfs_command.sh
+# it is picked up by casper-bottom
+
+# These helped me debug:
+# ls -la /sbin /bin > /root/ls-bins-from-initramfs.txt
+# ls -la / > /root/ls-root-from-initramfs.txt
+# df > /root/df-from-initramfs.txt
+
+# The initramfs doesn't have chroot or dpkg, but our installer is mounted under /root!
+/root/usr/sbin/chroot /root dpkg -i /isodevice/cache/<%=::File.basename(node['ii-usb']['chef-deb']['src']['cache'])%> > /root/chef-install-before-ubiquity-or-gui.txt
+
+# Running chef-solo here would allow us to modify everything

@@ -1,0 +1,17 @@
+#!/bin/sh
+# /cdrom mounted iso
+# /isodevice usb stick
+# /target does NOT exist yet
+# to run this you need
+# d-i partman/early_command string bash /isodevice/prepartitioning_command.sh
+# it is picked up by the partman plugin of ubiquity
+
+# These helped me debug:
+# ls -laR / > /root-ls-from-prepartitioning.txt
+# df > /df-from-prepartitioning.txt
+
+dpkg -i /isodevice/cache/<%=::File.basename(node['ii-usb']['chef-deb']['src']['cache'])%> > /chef-install-during-early-ubiquity.txt
+
+# Chef-client here could do interesting things to modify the install process
+# ie ALL the debconf values driving the install
+# probably need a provider for this
