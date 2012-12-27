@@ -5,20 +5,20 @@ This cookboks aims to create bootable USB sticks that contain OS vendor ISO.
 Currenty Ubuntu 12.04.1 is supported, but Windows and OSX are foreseeable targets.
 
 
-# Ubuntu allows for booting ISOs with seeded execute at different stages
+## Ubuntu allows for booting ISOs with seeded execute at different stages
 
-* https://help.ubuntu.com/community/Grub2/ISOBoot/Examples
+### https://help.ubuntu.com/community/Grub2/ISOBoot/Examples
+* 
 
-** https://wiki.ubuntu.com/UbiquityAutomation
-** https://help.ubuntu.com/12.04/installation-guide/i386/preseed-advanced.html#preseed-hooks
+### https://wiki.ubuntu.com/UbiquityAutomation
+* preseed/early_command #chef before gui
+* ubiquity/success_command #chef on target system
 
-* preseed/early_command
-* ubiquity/success_command
-* partman/early_command
+### https://help.ubuntu.com/12.04/installation-guide/i386/preseed-advanced.html#preseed-hooks
+* partman/early_command #chef before partitioning
 
 This allows us to have a chef-client/solo run during OS installation,
 even before partitioning has taken place.
-
 
 Requirements
 ============
