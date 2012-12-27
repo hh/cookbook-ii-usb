@@ -1,30 +1,19 @@
 Description
 ===========
 
-This cookboks aims to create bootable USB sticks that contain OS vendor ISO.
+This cookboks aims to create bootable USB sticks that contain OS
+vendor ISO.  These ISO's are booted for fully automated installs via
+seedfiles (Debian/Ubuntu) and Autounattended.xml
+(Windows). Chef-client is installed at all possible injection points,
+allowing for chef-driven hardware installs.
+
 Currenty Ubuntu 12.04.1 is supported, but Windows and OSX are foreseeable targets.
-
-
-## Ubuntu allows for booting ISOs with seeded execute at different stages
-
-### https://help.ubuntu.com/community/Grub2/ISOBoot/Examples
-* 
-
-### https://wiki.ubuntu.com/UbiquityAutomation
-* preseed/early_command #chef before gui
-* ubiquity/success_command #chef on target system
-
-### https://help.ubuntu.com/12.04/installation-guide/i386/preseed-advanced.html#preseed-hooks
-* partman/early_command #chef before partitioning
-
-This allows us to have a chef-client/solo run during OS installation,
-even before partitioning has taken place.
 
 Requirements
 ============
 
-* Fast USB stick you don't mind formatting.
 * Ubuntu 12.04 host
+* Fast USB stick you don't mind formatting.
 
 Attributes
 ==========
@@ -42,6 +31,10 @@ node['ii-usb']['src-chef-repo']
 the path of the chef-repo you want rsynced onto the usb.
 Eventually this will be a git resource.
 
+```
+node['ii-usb']['target-solo-config'] = 'target-solo.rb'
+```
+chef-solo config file for chef run on target
 
 Usage
 =====
@@ -81,7 +74,7 @@ verbose_logging false
 Then run:
 
 ```shell
-sudo TARGETUSB=/dev/sdc /opt/opscode/bin/chef-solo -c ./create-usb-solo.rb
+sudo TARGETUSB=/dev/sdc chef-solo -c ./create-usb-solo.rb
 sudo umount /media/ii-usb*/ # ubuntu likes to automount....
 sudo umount /tmp/ii-usb-target/ # the default mountpoint, so I can put it into my test computer
 ```
