@@ -41,11 +41,11 @@ d-i clock-setup/ntp boolean true
 ### Account setup
 # To create a normal user account.
 d-i passwd/user-fullname string Laptop User
-d-i passwd/username string user
+d-i passwd/username string <%=node['ii-usb']['target-user']['login']%>
 
 # Normal user's password, either in clear text
-d-i passwd/user-password password user
-d-i passwd/user-password-again password user
+d-i passwd/user-password password <%=node['ii-usb']['target-user']['password']%>
+d-i passwd/user-password-again password <%=node['ii-usb']['target-user']['password']%>
 
 # The installer will warn about weak passwords. If you are sure you know
 # what you're doing and want to override it, uncomment this.
@@ -133,7 +133,6 @@ d-i ubiquity/success_command string bash /isodevice/success_command.sh
 # our cdrom is available under /root/cdrom
 d-i preseed/early_command string /root/isodevice/initramfs_command.sh
 
-
 # The following DOES NOT run under ubiquity:
 # This command is run just before the install finishes, but when there is
 # still a usable /target directory. You can chroot to /target and use it
@@ -141,6 +140,8 @@ d-i preseed/early_command string /root/isodevice/initramfs_command.sh
 # packages and run commands in the target system.
 #d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh
 # our boot media is available under /isodevice at this point
-d-i preseed/late_command string bash /isodevice/late_command.sh
+# d-i preseed/late_command string bash /isodevice/late_command.sh
 
-d-i console-setup/variantcode string dvorak
+# We need universe for apt-cacher-ng..... 
+d-i apt-setup/universe boolean true
+

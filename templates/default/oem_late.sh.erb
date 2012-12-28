@@ -1,0 +1,5 @@
+#!/bin/sh
+set +e -x
+exec > >(tee /root/oem-config_late-command.log | logger -t sputnik-oem-late -s 2>/dev/console ) 2>&1
+date
+df

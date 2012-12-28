@@ -1,4 +1,6 @@
 #!/bin/sh
+exec > >(tee /target/root/success_command.log | logger -t success_command -s 2>/dev/console ) 2>&1
+set +e -x
 # /root is your installers fs
 # /root/cdrom is the mounted version of the iso file
 # /root/isodevice is the usb we booted from
@@ -9,9 +11,19 @@
 
 mount -o bind /isodevice /target/mnt
 cp -av /*txt /target/root
-chroot /target dpkg -i /mnt/cache/<%=::File.basename(node['ii-usb']['chef-deb']['src']['cache'])%> > /target/root/chef-install-on-target.txt
+chroot /target dpkg -i /mnt/cache/<%=::File.basename(node['ii-usb']['chef-deb']['src']['cache'])%>
+
+# chroot /target hostname laptop.training # because ohai fails if 'hostname -f' doesn't have fqdn
+# running chef-client in chroot is a pain https://bugs.launchpad.net/ubuntu/+source/upstart/+bug/430224
+# dpkg-divert --local --rename --add /sbin/initctl
+# ln -s /bin/true /sbin/initctl
+# allows thing to sorta work, but we do can get into a mess if we actually want services to start
+cp -av /isodevice/chef-repo /target/root/chef-repo
+
+cp -a /isodevice/firstboot.sh /target/root
+sed -i 's_exit 0_bash /root/firstboot.sh_' /target/etc/rc.local; 
 
 # sleep helps me debug 
-sleep 9999
+# sleep 9999
 
 # chroot chef-solo -c /mnt/chef-repo/late-solo.rb

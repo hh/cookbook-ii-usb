@@ -1,0 +1,10 @@
+#!/bin/sh
+set +e -x
+exec > >(tee /root/oem-config_early-command.log | logger -t sputnik-oem-late -s 2>/dev/console ) 2>&1
+date
+df
+# This is run during the early during the OOBE
+# The installer will hang if you don't background this script:
+#nohup /root/first-boot.sh > /dev/null < /dev/null 2>&1 &
+
+

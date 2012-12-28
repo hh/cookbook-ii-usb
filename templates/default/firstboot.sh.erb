@@ -1,0 +1,39 @@
+#!/bin/bash
+exec > >(tee /root/first-boot.log | logger -t first-boot -s 2>/dev/console ) 2>&1
+set +e -x
+
+export DISPLAY=:0.0
+
+sed -i 's/^%admin.*/%admin ALL=(ALL) NOPASSWD: ALL/' /etc/sudoers
+sed -i 's/^%sudo.*/%sudo ALL=(ALL) NOPASSWD: ALL/' /etc/sudoers
+
+# chef-solo -c /root/chef-repo/firstboot-solo.rb
+# Writing something to run at this stage might be fun
+
+mkdir -p /home/<%=node['ii-usb']['target-user']['login']%>/.config/autostart
+mkdir -p /home/<%=node['ii-usb']['target-user']['login']%>/Desktop
+
+cat <<EOF> /home/<%=node['ii-usb']['target-user']['login']%>/.config/autostart/laptop.training.desktop
+[Desktop Entry]
+Type=Application
+Terminal=true
+Exec=sudo chef-solo -c /root/chef-repo/.chef/solo.rb
+Name=Setup Training Laptop
+EOF
+chmod 755 /home/<%=node['ii-usb']['target-user']['login']%>/.config/autostart/laptop.training.desktop
+
+cat <<EOF> /home/<%=node['ii-usb']['target-user']['login']%>/Desktop/laptop.training.desktop
+[Desktop Entry]
+Type=Application
+Terminal=true
+Exec=sudo chef-solo -c /root/chef-repo/.chef/solo.rb
+Name=Setup Training Laptop
+EOF
+chmod 755 /home/<%=node['ii-usb']['target-user']['login']%>/Desktop/laptop.training.desktop
+
+chown -R <%=node['ii-usb']['target-user']['login']%>:<%=node['ii-usb']['target-user']['login']%> /home/<%=node['ii-usb']['target-user']['login']%>
+
+exit 0
+
+# remove ourselves from startup
+#sed -i 's_bash /root/firstboot.sh_exit 0_' /etc/rc.local

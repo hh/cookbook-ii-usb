@@ -29,3 +29,6 @@ template "#{usb}/success_command.sh" do
   source 'success_command.sh.erb'
 end
 
+template "#{usb}/firstboot.sh" do
+  source 'firstboot.sh.erb'
+end

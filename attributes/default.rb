@@ -15,3 +15,6 @@ default['ii-usb']['target-mountpoint']='/tmp/ii-usb-target'
 default['ii-usb']['ubuntu-mountpoint']='/tmp/ii-ubuntu-src'
 default['ii-usb']['volume-name']='ii-usb'
   
+
+default['ii-usb']['target-user']['login']='user'
+default['ii-usb']['target-user']['password']='user'

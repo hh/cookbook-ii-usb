@@ -1,0 +1,15 @@
+## Ubuntu allows for booting ISOs with seeded execute at different stages
+
+### https://help.ubuntu.com/community/Grub2/ISOBoot/Examples
+* 
+
+### https://wiki.ubuntu.com/UbiquityAutomation
+* preseed/early_command #chef before gui
+* ubiquity/success_command #chef on target system
+
+### https://help.ubuntu.com/12.04/installation-guide/i386/preseed-advanced.html#preseed-hooks
+* partman/early_command #chef before partitioning
+
+This allows us to have a chef-client/solo run during OS installation,
+even before partitioning has taken place.
+
