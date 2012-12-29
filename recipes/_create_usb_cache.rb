@@ -6,6 +6,7 @@ directory "#{node['ii-usb']['target-mountpoint']}/cache"
   file target_file do
     content node['ii-usb'][cf]['src']['cache']
     provider Chef::Provider::File::Copy
+    backup false
     not_if {File.file?(target_file) && File.size(target_file) > 10*100*100 }
   end
 end

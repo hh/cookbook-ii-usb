@@ -14,6 +14,7 @@ end
 file "#{node['ii-usb']['target-mountpoint']}/efi/boot/bootx64.efi" do
   content "#{node['ii-usb']['ubuntu-mountpoint']}/efi/boot/bootx64.efi"
   provider Chef::Provider::File::Copy
+  backup false
 end
 
 ['boot/grub/x86_64-efi','boot/grub','.disk'].each do |dir|
@@ -28,6 +29,7 @@ end
       file afile_target do
         content afile_src
         provider Chef::Provider::File::Copy
+        backup false
       end
     end
   end
@@ -37,5 +39,6 @@ directory "#{node['ii-usb']['ubuntu-mountpoint']}/cache"
 file File.join(node['ii-usb']['target-mountpoint'],'cache',File.basename(node['ii-usb']['ubuntu-iso']['src']['cache'])) do
   content node['ii-usb']['ubuntu-iso']['src']['cache']
   provider Chef::Provider::File::Copy
+  backup false
 end
 

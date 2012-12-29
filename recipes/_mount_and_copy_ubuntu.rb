@@ -13,6 +13,7 @@ end
 
 file "#{node['ii-usb']['target-mountpoint']}/efi/boot/bootx64.efi" do
   content "#{node['ii-usb']['ubuntu-mountpoint']}/efi/boot/bootx64.efi"
+  backup false
   provider Chef::Provider::File::Copy
 end
 
@@ -31,6 +32,7 @@ end
     afile_target = File.join(node['ii-usb']['target-mountpoint'],dir,afile)
     if File.file? afile_src
       file afile_target do
+        backup false
         content afile_src
         provider Chef::Provider::File::Copy
       end
