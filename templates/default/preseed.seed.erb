@@ -121,7 +121,7 @@ d-i finish-install/reboot_in_progress note
 # of the disks (which may not be visible when preseed/early_command runs).
 #d-i partman/early_command \
 #       string debconf-set partman-auto/disk "$(list-devices disk | head -n1)"
-d-i partman/early_command string bash /isodevice/prepartitioning_command.sh
+d-i partman/early_command string bash /isodevice/early_command.sh
 
 d-i ubiquity/success_command string bash /isodevice/success_command.sh
 # d-i ubiquity/failure_command string 
