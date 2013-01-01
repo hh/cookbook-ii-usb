@@ -18,12 +18,22 @@ chroot /target dpkg -i /mnt/cache/<%=::File.basename(node['ii-usb']['chef-deb'][
 # dpkg-divert --local --rename --add /sbin/initctl
 # ln -s /bin/true /sbin/initctl
 # allows thing to sorta work, but we do can get into a mess if we actually want services to start
+
 cp -av /isodevice/chef-repo /target/root/chef-repo
 
 cp -a /isodevice/firstboot.sh /target/root
 sed -i 's_exit 0_bash /root/firstboot.sh_' /target/etc/rc.local; 
 
-# sleep helps me debug 
-# sleep 9999
+mount -t proc none /target/proc
+chroot /target hostname localhost
+chroot /target chef-solo -c /mnt/chef-repo/ubiquity-success-solo.rb
 
-# chroot chef-solo -c /mnt/chef-repo/late-solo.rb
+# chroot /target hostname laptop.training # because ohai fails if 'hostname -f' doesn't have fqdn
+# running chef-client in chroot is a pain https://bugs.launchpad.net/ubuntu/+source/upstart/+bug/430224
+# dpkg-divert --local --rename --add /sbin/initctl
+# ln -s /bin/true /sbin/initctl
+# allows thing to sorta work, but we do can get into a mess if we actually want services to start
+
+# sleep helps me debug 
+sleep 9999
+

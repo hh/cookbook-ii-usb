@@ -11,7 +11,26 @@
 # ls -la / > /root/ls-root-from-initramfs.txt
 # df > /root/df-from-initramfs.txt
 
+# within the casper/squashfs / I wanted to change the pulsing logo
+# This allows a quick updating of the splash
+cp /root/isodevice/chef-repo/cookbooks/ii-ubiquity/files/default/ubuntu_logo*png /lib/plymouth/themes/ubuntu-logo
+plymouth hide-splash
+plymouth show-splash
+
 # The initramfs doesn't have chroot or dpkg, but our installer is mounted under /root!
 /root/usr/sbin/chroot /root dpkg -i /isodevice/cache/<%=::File.basename(node['ii-usb']['chef-deb']['src']['cache'])%> > /root/chef-install-before-ubiquity-or-gui.txt
 
 # Running chef-solo here would allow us to modify everything
+
+# This was Interesting, but squashfs doesn't register as a valid chef-platform
+#ln -s /root/opt /opt
+#LD_LIBRARY_PATH=/root/lib/x86_64-linux-gnu /root/opt/chef/embedded/bin/ruby /root/opt/chef/bin/chef-solo -c /root/isodevice/chef-repo/ubiquity-initramfs-initrd-solo.rb
+
+
+# Running chef-solo here would allow us to modify everything within the installer squashfs
+/root/usr/sbin/chroot /root chef-solo -c /isodevice/chef-repo/ubiquity-initramfs-solo.rb
+
+# Nice to get a prompt for debugging
+# /root/usr/sbin/chroot /root open -c 9 /bin/bash # in the capser/squashfs
+# /root/bin/open -c 8 /bin/sh # in the initrd alone (busybox)
+# sleep 9999

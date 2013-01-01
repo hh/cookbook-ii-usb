@@ -21,8 +21,8 @@ template "#{usb}/initramfs_command.sh" do
   source 'initramfs_command.sh.erb'
 end
 
-template "#{usb}/prepartitioning_command.sh" do
-  source 'prepartitioning_command.sh.erb'
+template "#{usb}/early_command.sh" do
+  source 'early_command.sh.erb'
 end
 
 template "#{usb}/success_command.sh" do
@@ -32,3 +32,4 @@ end
 template "#{usb}/firstboot.sh" do
   source 'firstboot.sh.erb'
 end
+
