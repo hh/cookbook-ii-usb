@@ -16,7 +16,7 @@ set isofile="/cache/<%= @iso_name %>"
 menuentry "Fully Automated Laptop install to Disk" {
   loopback loop $isofile
 	set gfxpayload=keep
-	linux	(loop)/casper/vmlinuz splash quiet noprompt noeject automatic-ubiquity debug-ubiquity boot=casper iso-scan/filename=$isofile file=/isodevice/preseed.seed locale=en_US --
+	linux	(loop)/casper/vmlinuz splash quiet noprompt noeject automatic-ubiquity debug-ubiquity boot=casper iso-scan/filename=$isofile file=/isodevice/preseed.seed locale=en_US nox2apic --
 	initrd	(loop)/casper/initrd.lz
 }
 
@@ -35,14 +35,14 @@ menuentry "Fully Automated Laptop install to Disk" {
 
 menuentry "Live Laptop on USB" {
  loopback loop $isofile
- linux (loop)/casper/vmlinuz boot=casper iso-scan/filename=$isofile splash --
+ linux (loop)/casper/vmlinuz boot=casper iso-scan/filename=$isofile splash nox2apic --
  initrd (loop)/casper/initrd.lz
 }
 
 menuentry "Try Ubuntu without installing" {
   loopback loop $isofile
 	set gfxpayload=keep
-	linux	(loop)/casper/vmlinuz boot=casper iso-scan/filename=$isofile file=/isodevice/preseed.seed quiet splash --
+	linux	(loop)/casper/vmlinuz boot=casper iso-scan/filename=$isofile file=/isodevice/preseed.seed quiet splash nox2apic --
 	initrd	(loop)/casper/initrd.lz
 }
 
