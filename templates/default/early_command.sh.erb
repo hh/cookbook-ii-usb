@@ -15,7 +15,7 @@ set +e -x
 dpkg -i /isodevice/cache/<%=::File.basename(node['ii-usb']['chef-deb']['src']['cache'])%>
 
 # Chef-client here could do interesting things to modify the install process
-# ie ALL the debconf values driving the install
-# probably need a provider for this
+# ie the debconf values driving the install
 
-chef-solo -c /isodevice/chef-repo/ubiquity-early-solo.rb
+chef-solo -c /isodevice/ubiquity-early-solo.rb
+#chef-client -c /isodevice/ubiquity-early-client.rb

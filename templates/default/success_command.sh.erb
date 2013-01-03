@@ -26,7 +26,7 @@ sed -i 's_exit 0_bash /root/firstboot.sh_' /target/etc/rc.local;
 
 mount -t proc none /target/proc
 chroot /target hostname localhost
-chroot /target chef-solo -c /mnt/chef-repo/ubiquity-success-solo.rb
+chroot /target chef-solo -c /mnt/ubiquity-success-solo.rb
 
 # chroot /target hostname laptop.training # because ohai fails if 'hostname -f' doesn't have fqdn
 # running chef-client in chroot is a pain https://bugs.launchpad.net/ubuntu/+source/upstart/+bug/430224

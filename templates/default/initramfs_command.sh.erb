@@ -28,7 +28,8 @@ plymouth show-splash
 
 
 # Running chef-solo here would allow us to modify everything within the installer squashfs
-/root/usr/sbin/chroot /root chef-solo -c /isodevice/chef-repo/ubiquity-initramfs-solo.rb
+/root/usr/sbin/chroot /root chef-solo -c /isodevice/ubiquity-initramfs-solo.rb
+#/root/usr/sbin/chroot /root chef-client -c /isodevice/ubiquity-initramfs-client.rb
 
 # Nice to get a prompt for debugging
 # /root/usr/sbin/chroot /root open -c 9 /bin/bash # in the capser/squashfs
