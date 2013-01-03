@@ -1,0 +1,22 @@
+current_dir = ::File.dirname(::File.absolute_path(__FILE__))
+verbose_logging false
+cookbook_path "#{current_dir}/chef-repo/cookbooks" #, "#{current_dir}/site-cookbooks"
+role_path "#{current_dir}/chef-repo/roles"
+cache_type               'BasicFile'
+# ../cache should be at the root of the USB... or just above our repo
+file_cache_path "#{current_dir}/cache"
+cache_options(:path => "#{current_dir}/cache/checksums")
+file_backup_path "#{current_dir}/cache/backup"
+
+solo_json_file = "#{current_dir}/cache/<%= @stage %>-solo.json"
+open(solo_json_file,'w+') do |f|
+  f.write(
+    {
+      "run_list" => [
+        "recipe[ii-ubiquity::<%= @stage %>]"
+        ]
+    }.to_json
+    )
+end if not ::File.exists? solo_json_file
+json_attribs solo_json_file
+
