@@ -13,22 +13,20 @@ sed -i 's/^%sudo.*/%sudo ALL=(ALL) NOPASSWD: ALL/' /etc/sudoers
 mkdir -p /home/<%=node['ii-usb']['target-user']['login']%>/.config/autostart
 mkdir -p /home/<%=node['ii-usb']['target-user']['login']%>/Desktop
 
-cat <<EOF> /home/<%=node['ii-usb']['target-user']['login']%>/.config/autostart/laptop.training.desktop
+cat <<EOF| tee /home/<%=node['ii-usb']['target-user']['login']%>/.config/autostart/from-scratch.desktop \
+         | tee /home/<%=node['ii-usb']['target-user']['login']%>/Desktop/from-scratch.desktop
 [Desktop Entry]
 Type=Application
-Terminal=true
-Exec=sudo chef-solo -c /root/chef-repo/.chef/solo.rb
-Name=Setup Training Laptop
+Exec=gnome-terminal -t chef -e "sudo chef-solo -c /root/chef-repo/.chef/solo.rb"
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[en_US]=foo
+Name=From Scratch
+Comment[en_US]=From Scratch
+Comment=From Scratch
 EOF
 chmod 755 /home/<%=node['ii-usb']['target-user']['login']%>/.config/autostart/laptop.training.desktop
-
-cat <<EOF> /home/<%=node['ii-usb']['target-user']['login']%>/Desktop/laptop.training.desktop
-[Desktop Entry]
-Type=Application
-Terminal=true
-Exec=sudo chef-solo -c /root/chef-repo/.chef/solo.rb
-Name=Setup Training Laptop
-EOF
 chmod 755 /home/<%=node['ii-usb']['target-user']['login']%>/Desktop/laptop.training.desktop
 
 chown -R <%=node['ii-usb']['target-user']['login']%>:<%=node['ii-usb']['target-user']['login']%> /home/<%=node['ii-usb']['target-user']['login']%>
