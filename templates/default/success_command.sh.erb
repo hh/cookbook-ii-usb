@@ -10,7 +10,7 @@ set +e -x
 # it is picked up by ubiquity when successful
 
 mount -o bind /isodevice /target/mnt
-cp -av /*txt /target/root
+cp -av /*log /target/root
 chroot /target dpkg -i /mnt/cache/<%=::File.basename(node['ii-usb']['chef-deb']['src']['cache'])%>
 
 # chroot /target hostname laptop.training # because ohai fails if 'hostname -f' doesn't have fqdn
@@ -26,7 +26,10 @@ sed -i 's_exit 0_bash /root/firstboot.sh_' /target/etc/rc.local;
 
 mount -t proc none /target/proc
 chroot /target hostname localhost
-chroot /target chef-solo -c /mnt/ubiquity-success-solo.rb
+chvt 10
+chroot /target chef-solo -c /mnt/ubiquity-success-solo.rb 2>&1 | tee /dev/tty10 | tee /target/root/chef-solo-success.log
+sleep 5
+chvt 7
 
 # chroot /target hostname laptop.training # because ohai fails if 'hostname -f' doesn't have fqdn
 # running chef-client in chroot is a pain https://bugs.launchpad.net/ubuntu/+source/upstart/+bug/430224
@@ -35,5 +38,5 @@ chroot /target chef-solo -c /mnt/ubiquity-success-solo.rb
 # allows thing to sorta work, but we do can get into a mess if we actually want services to start
 
 # sleep helps me debug 
-sleep 9999
+# sleep 9999
 

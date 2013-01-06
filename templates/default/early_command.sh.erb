@@ -1,5 +1,5 @@
 #!/bin/sh
-exec > >(tee /prepartitioning_command.log | logger -t prepartitioning-command -s 2>/dev/console ) 2>&1
+exec > >(tee /early_command.log | logger -t early-command -s 2>/dev/console ) 2>&1
 set +e -x
 # /cdrom mounted iso
 # /isodevice usb stick
@@ -17,5 +17,12 @@ dpkg -i /isodevice/cache/<%=::File.basename(node['ii-usb']['chef-deb']['src']['c
 # Chef-client here could do interesting things to modify the install process
 # ie the debconf values driving the install
 
-chef-solo -c /isodevice/ubiquity-early-solo.rb
+chvt 9
+chef-solo -c /isodevice/ubiquity-early-solo.rb 2>&1 | tee /dev/tty9 | tee /chef-solo-early.log
+sleep 5
+chvt 7
+#export DISPLAY=:0.0
+#gnome-terminal -t debug-terminal
+#gnome-terminal -t early-chef -e 'tail -F /chef-solo-early.log'
+
 #chef-client -c /isodevice/ubiquity-early-client.rb
