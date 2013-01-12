@@ -1,4 +1,27 @@
 #!/bin/sh
+
+
+# The initramfs doesn't have chroot or dpkg, but our installer is mounted under /root!
+
+CHROOT="/root/usr/sbin/chroot /root"
+TMPVT=8
+
+$CHROOT chvt $TMPVT
+#cp -v /root/isodevice/chef-repo/cookbooks/ii-ubiquity/files/default/ubuntu_logo*png /lib/plymouth/themes/ubuntu-logo \
+cp -v /root/isodevice/chef-repo/cookbooks/ii-ubiquity/files/default/swedishChef.png /lib/plymouth/themes/ubuntu-logo/ubuntu_logo.png \
+    | tee /dev/tty$TMPVT | tee -a /root/initramfs_command.log
+plymouth hide-splash \
+    | tee /dev/tty$TMPVT | tee -a /root/initramfs_command.log
+$CHROOT dpkg -i /isodevice/cache/<%=::File.basename(node['ii-usb']['chef-deb']['src']['cache'])%> \
+    | tee /dev/tty$TMPVT | tee -a /root/initramfs_command.log
+$CHROOT chef-solo -c /isodevice/ubiquity-initramfs-solo.rb \
+    | tee /dev/tty$TMPVT | tee -a /root/initramfs_command.log
+sleep <%=node['ii-usb']['chvt']['sleep'] %> \
+    | tee /dev/tty$TMPVT | tee -a /root/initramfs_command.log
+plymouth show-splash \
+    | tee /dev/tty$TMPVT | tee -a /root/initramfs_command.log
+$CHROOT chvt 7
+
 # /root is your installers fs
 # /root/cdrom is the mounted version of the iso file
 # /root/isodevice is the usb we booted from
@@ -13,13 +36,7 @@
 
 # within the casper/squashfs / I wanted to quickly change the pulsing logo
 # Would probably be more interesting to make a custom plymouth theme
-cp /root/isodevice/chef-repo/cookbooks/ii-ubiquity/files/default/ubuntu_logo*png /lib/plymouth/themes/ubuntu-logo
-plymouth hide-splash
-plymouth show-splash
 
-# The initramfs doesn't have chroot or dpkg, but our installer is mounted under /root!
-
-/root/usr/sbin/chroot /root dpkg -i /isodevice/cache/<%=::File.basename(node['ii-usb']['chef-deb']['src']['cache'])%> | tee /dev/tty8 > /root/chef-install-before-ubiquity-or-gui.log
 #/root/usr/sbin/chroot /root open -c 8 -- dpkg -i /isodevice/cache/<%=::File.basename(node['ii-usb']['chef-deb']['src']['cache'])%> > /root/chef-install-before-ubiquity-or-gui.txt
 
 # Running chef-solo here would allow us to modify everything
@@ -30,10 +47,6 @@ plymouth show-splash
 
 # Running chef-solo here would allow us to modify everything
 # within the installer squashfs... ie wireless networks
-/root/usr/sbin/chroot /root chvt 8
-/root/usr/sbin/chroot /root chef-solo -c /isodevice/ubiquity-initramfs-solo.rb | tee /dev/tty8 | tee /root/chef-solo-initramfs.log
-sleep 5
-/root/usr/sbin/chroot /root chvt 7
 
 # It would also be possi
 #/root/usr/sbin/chroot /root chef-client -c /isodevice/ubiquity-initramfs-client.rb
