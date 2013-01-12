@@ -1,6 +1,13 @@
 #!/bin/sh
-exec > >(tee /early_command.log | logger -t early-command -s 2>/dev/console ) 2>&1
+TMPVT=9
+exec > >(tee /early_command.log | logger -t early-command -s 2>/dev/tty$TMPVT ) 2>&1
 set +e -x
+
+chvt $TMPVT
+chef-solo -c /isodevice/ubiquity-early-solo.rb 
+sleep <%=node['ii-usb']['chvt']['sleep'] %>
+chvt 7
+
 # /cdrom mounted iso
 # /isodevice usb stick
 # /target does NOT exist yet
@@ -12,15 +19,14 @@ set +e -x
 # ls -laR / > /root-ls-from-prepartitioning.txt
 # df > /df-from-prepartitioning.txt
 
-dpkg -i /isodevice/cache/<%=::File.basename(node['ii-usb']['chef-deb']['src']['cache'])%>
+# chef was already installed in initramfs_command.sh
+# dpkg -i /isodevice/cache/<%=::File.basename(node['ii-usb']['chef-deb']['src']['cache'])%>
 
 # Chef-client here could do interesting things to modify the install process
 # ie the debconf values driving the install
 
-chvt 9
-chef-solo -c /isodevice/ubiquity-early-solo.rb 2>&1 | tee /dev/tty9 | tee /chef-solo-early.log
-sleep 5
-chvt 7
+
+# 2>&1 # | tee /chef-solo-early.log # | tee /dev/tty9 
 #export DISPLAY=:0.0
 #gnome-terminal -t debug-terminal
 #gnome-terminal -t early-chef -e 'tail -F /chef-solo-early.log'

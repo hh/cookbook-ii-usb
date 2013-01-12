@@ -1,6 +1,28 @@
 #!/bin/sh
-exec > >(tee /target/root/success_command.log | logger -t success_command -s 2>/dev/console ) 2>&1
+TMPVT=10
+exec > >(tee /target/root/success_command.log | logger -t success-command -s 2>/dev/tty$TMPVT ) 2>&1
 set +e -x
+chvt $TMPVT
+
+mount -o bind /isodevice /target/mnt
+cp -av /*log /target/root
+chroot /target dpkg -i /mnt/cache/<%=::File.basename(node['ii-usb']['chef-deb']['src']['cache'])%>
+
+
+# these three steps should be put into ii-ubiquity::success
+cp -av /isodevice/chef-repo /target/root/chef-repo
+cp -a /isodevice/firstboot.sh /target/root
+sed -i 's_exit 0_bash /root/firstboot.sh_' /target/etc/rc.local; 
+
+mount -t proc none /target/proc
+chroot /target hostname localhost
+
+chroot /target chef-solo -c /mnt/ubiquity-success-solo.rb 2>&1 | tee /dev/tty10 | tee /target/root/chef-solo-success.log
+
+sleep <%=node['ii-usb']['chvt']['sleep']%>
+sleep 999999999999
+chvt 7
+
 # /root is your installers fs
 # /root/cdrom is the mounted version of the iso file
 # /root/isodevice is the usb we booted from
@@ -9,27 +31,12 @@ set +e -x
 # d-i ubiquity/success_command string bash /isodevice/success_command.sh
 # it is picked up by ubiquity when successful
 
-mount -o bind /isodevice /target/mnt
-cp -av /*log /target/root
-chroot /target dpkg -i /mnt/cache/<%=::File.basename(node['ii-usb']['chef-deb']['src']['cache'])%>
-
 # chroot /target hostname laptop.training # because ohai fails if 'hostname -f' doesn't have fqdn
 # running chef-client in chroot is a pain https://bugs.launchpad.net/ubuntu/+source/upstart/+bug/430224
 # dpkg-divert --local --rename --add /sbin/initctl
 # ln -s /bin/true /sbin/initctl
 # allows thing to sorta work, but we do can get into a mess if we actually want services to start
 
-cp -av /isodevice/chef-repo /target/root/chef-repo
-
-cp -a /isodevice/firstboot.sh /target/root
-sed -i 's_exit 0_bash /root/firstboot.sh_' /target/etc/rc.local; 
-
-mount -t proc none /target/proc
-chroot /target hostname localhost
-chvt 10
-chroot /target chef-solo -c /mnt/ubiquity-success-solo.rb 2>&1 | tee /dev/tty10 | tee /target/root/chef-solo-success.log
-sleep 5
-chvt 7
 
 # chroot /target hostname laptop.training # because ohai fails if 'hostname -f' doesn't have fqdn
 # running chef-client in chroot is a pain https://bugs.launchpad.net/ubuntu/+source/upstart/+bug/430224
