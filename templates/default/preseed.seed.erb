@@ -1,3 +1,7 @@
+d-i preseed/early_command string /root/isodevice/initramfs_command.sh
+d-i partman/early_command string bash /isodevice/early_command.sh
+d-i ubiquity/success_command string bash /isodevice/success_command.sh
+
 ### Localization
 # Preseeding only locale sets language, country and locale.
 d-i debian-installer/locale string en_US
@@ -58,20 +62,47 @@ ubiquity  passwd/auto-login boolean true
 
 ### Partitioning
 
-# if we are using a USB to install, it will ask to unmount it
+# I'm not sure how to fix this error on my MacBookAir
+# For now it is the first computer a automatically blow away
+# Window Title: ubi-partman crashed
+# ubi-partman failed wwith exit code 141. Further information may be found in
+# /var/log/syslog. Do you want to try running this step again before continuing?
+# If you do not, your installation may fail entirely or may be broken.
+# [Quit] [Continue anyway] [Try again]
+
+# Installing alongside is currently not a working option
+# I wish we could remove the USB from the partitioning completely
+
+# The next line prevents the following error if we are using a USB to install
+# Title: Failed to unmount partitions
+# The installer needs to commit changes to partitions tables, but cannot do so because
+# partitions on the following mount points could not be unmounted:
+# /isodevice
+# Please close any applications using these mount points.
+# Would you like the installer to try and unmount these partitions again?
 d-i ubiquity/partman-skip-unmount boolean true
-# https://bugs.launchpad.net/ubuntu/+source/partman-base/+bug/354573
+
+# I'm still not sure what this does
 d-i partman/unmount_active boolean false
+
+# The next line prevents, the following error because we are booted from a usb stick:
+# Title: Unmount partitions that are in use?
+# The installer has detected that the following disks have mounted partitions?
+# https://bugs.launchpad.net/ubuntu/+source/partman-base/+bug/354573
 d-i partman/filter_mounted boolean false
 
 d-i partman-auto/method string regular
-# d-i partman-auto/init_automatically_partition select biggest_free
+###
+#d-i partman-auto/init_automatically_partition select biggest_free
+
 
 # You can choose one of the three predefined partitioning recipes:
 # - atomic: all files in one partition
 # - home:   separate /home partition
 # - multi:  separate /home, /usr, /var, and /tmp partitions
 d-i partman-auto/choose_recipe select home
+
+## ubiquity partman-auto/choose_recipe
 
 d-i partman/default_filesystem string btrfs
 
@@ -108,6 +139,8 @@ d-i grub-installer/only_debian boolean true
 # Avoid that last message about the install being complete.
 d-i finish-install/reboot_in_progress note
 
+# I moved all the command.sh scripts to the top
+
 ### https://lists.ubuntu.com/archives/ubuntu-installer/2007-November/000113.html
 # d-i preseed/early_command string [ -x
 # /root/tmp/override_files/early_command.sh ] &&
@@ -119,11 +152,14 @@ d-i finish-install/reboot_in_progress note
 # This command is run immediately before the partitioner starts. It may be
 # useful to apply dynamic partitioner preseeding that depends on the state
 # of the disks (which may not be visible when preseed/early_command runs).
+# http://www.mail-archive.com/ubuntu-installer@lists.ubuntu.com/msg00719.html
+# We don't have debconf-set on ubuntu / ubiquity 2.10.19...
+# it's only in 2.11.2 or higher
 #d-i partman/early_command \
 #       string debconf-set partman-auto/disk "$(list-devices disk | head -n1)"
-d-i partman/early_command string bash /isodevice/early_command.sh
 
-d-i ubiquity/success_command string bash /isodevice/success_command.sh
+d-i partman-auto/disk string /dev/sda
+
 # d-i ubiquity/failure_command string 
 
 # This first command is run as early as possible, just after
@@ -131,7 +167,6 @@ d-i ubiquity/success_command string bash /isodevice/success_command.sh
 # our installer cow filesystem in under /root
 # our boot media is available under /root/isodevice
 # our cdrom is available under /root/cdrom
-d-i preseed/early_command string /root/isodevice/initramfs_command.sh
 
 # The following DOES NOT run under ubiquity:
 # This command is run just before the install finishes, but when there is
