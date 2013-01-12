@@ -1,12 +1,13 @@
 current_dir = ::File.dirname(::File.absolute_path(__FILE__))
 verbose_logging false
 cookbook_path "#{current_dir}/chef-repo/cookbooks" #, "#{current_dir}/site-cookbooks"
+# Ohai::Config[:plugin_path] = "/etc/chef/ohai_plugins"
 role_path "#{current_dir}/chef-repo/roles"
 cache_type               'BasicFile'
 # ../cache should be at the root of the USB... or just above our repo
 file_cache_path "#{current_dir}/cache"
-cache_options(:path => "#{current_dir}/cache/checksums")
-file_backup_path "#{current_dir}/cache/backup"
+cache_options(:path => "/tmp/checksums")
+file_backup_path "/tmp/backup"
 
 solo_json_file = "#{current_dir}/cache/<%= @stage %>-solo.json"
 open(solo_json_file,'w+') do |f|
