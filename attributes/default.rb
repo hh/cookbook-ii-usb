@@ -11,10 +11,13 @@ default['ii-usb']['chef-deb']['src'] = {
 }
 
 default['ii-usb']['target-device']='/dev/null'
-default['ii-usb']['target-mountpoint']='/tmp/ii-usb-target'
-default['ii-usb']['ubuntu-mountpoint']='/tmp/ii-ubuntu-src'
+default['ii-usb']['target-mountpoint']='/media/ii-usb'
+default['ii-usb']['ubuntu-mountpoint']='/media/ubuntu-iso'
 default['ii-usb']['volume-name']='ii-usb'
+# -1 means as big as possible, otherwise positive integers in MB
+default['ii-usb']['partition-size']='2000' 
   
 
 default['ii-usb']['target-user']['login']='user'
 default['ii-usb']['target-user']['password']='user'
+default['ii-usb']['chvt']['sleep']='10'
