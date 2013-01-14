@@ -17,10 +17,9 @@ sed -i 's_exit 0_bash /root/firstboot.sh_' /target/etc/rc.local;
 mount -t proc none /target/proc
 chroot /target hostname localhost
 
-chroot /target chef-solo -c /mnt/ubiquity-success-solo.rb 2>&1 | tee /dev/tty10 | tee /target/root/chef-solo-success.log
+chroot /target chef-solo -c /mnt/ubiquity-success-solo.rb #2>&1 | tee /dev/tty10 | tee /target/root/chef-solo-success.log
 
 sleep <%=node['ii-usb']['chvt']['sleep']%>
-sleep 999999999999
 chvt 7
 
 # /root is your installers fs

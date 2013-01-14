@@ -3,23 +3,19 @@
 
 # The initramfs doesn't have chroot or dpkg, but our installer is mounted under /root!
 
-CHROOT="/root/usr/sbin/chroot /root"
 TMPVT=8
+CHROOT="/root/usr/sbin/chroot /root"
+
+cp -v /root/isodevice/chef-repo/cookbooks/ii-ubiquity/files/default/swedishChef.png /lib/plymouth/themes/ubuntu-logo/ubuntu_logo.png | tee -a /root/initramfs_command.log > /dev/tty$TMPVT 
+plymouth hide-splash
+plymouth show-splash
+
 
 $CHROOT chvt $TMPVT
 #cp -v /root/isodevice/chef-repo/cookbooks/ii-ubiquity/files/default/ubuntu_logo*png /lib/plymouth/themes/ubuntu-logo \
-cp -v /root/isodevice/chef-repo/cookbooks/ii-ubiquity/files/default/swedishChef.png /lib/plymouth/themes/ubuntu-logo/ubuntu_logo.png \
-    | tee /dev/tty$TMPVT | tee -a /root/initramfs_command.log
-plymouth hide-splash \
-    | tee /dev/tty$TMPVT | tee -a /root/initramfs_command.log
-$CHROOT dpkg -i /isodevice/cache/<%=::File.basename(node['ii-usb']['chef-deb']['src']['cache'])%> \
-    | tee /dev/tty$TMPVT | tee -a /root/initramfs_command.log
-$CHROOT chef-solo -c /isodevice/ubiquity-initramfs-solo.rb \
-    | tee /dev/tty$TMPVT | tee -a /root/initramfs_command.log
-sleep <%=node['ii-usb']['chvt']['sleep'] %> \
-    | tee /dev/tty$TMPVT | tee -a /root/initramfs_command.log
-plymouth show-splash \
-    | tee /dev/tty$TMPVT | tee -a /root/initramfs_command.log
+$CHROOT dpkg -i /isodevice/cache/<%=::File.basename(node['ii-usb']['chef-deb']['src']['cache'])%> | tee -a /root/initramfs_command.log > /dev/tty$TMPVT
+$CHROOT chef-solo -c /isodevice/ubiquity-initramfs-solo.rb | tee -a /root/initramfs_command.log > /dev/tty$TMPVT
+sleep <%=node['ii-usb']['chvt']['sleep'] %>
 $CHROOT chvt 7
 
 # /root is your installers fs
@@ -52,6 +48,7 @@ $CHROOT chvt 7
 #/root/usr/sbin/chroot /root chef-client -c /isodevice/ubiquity-initramfs-client.rb
 
 # Nice to get a prompt for debugging.. but using open seems to keep the boot from progressing
+
 #/root/bin/open -c 8 /bin/sh # in the initrd alone (busybox)
 #/root/usr/sbin/chroot /root open -c 9 /bin/bash # in the capser/squashfs
 # sleep 9999
