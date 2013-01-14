@@ -30,14 +30,14 @@ template "#{usb}/preseed.seed" do
   source 'preseed.seed.erb'
 end
 
-# The four places we can run custom commands
-['initramfs_command','early_command','success_command','firstboot'].each do |script|
+# scripts run via seedfiles or kernel command lines
+['initramfs-persistent_command','initramfs_command','early_command','success_command','firstboot'].each do |script|
   template "#{usb}/#{script}.sh" do
     source "#{script}.sh.erb"
   end
 end
 
-['initramfs','early','success'].each do |stage|
+['initramfs-persistent','initramfs','early','success'].each do |stage|
   template "#{usb}/ubiquity-#{stage}-solo.rb" do
     source "ubiquity-solo.rb.erb"
     variables({

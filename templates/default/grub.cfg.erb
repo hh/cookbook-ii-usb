@@ -7,7 +7,7 @@ if loadfont /boot/grub/font.pf2 ; then
 fi
 
 # Setup theme
-set timeout=5
+#set timeout=0
 set gfxmode=auto
 insmod gfxterm
 terminal_output gfxterm
@@ -20,40 +20,21 @@ set theme=/boot/grub/ii/theme.txt
 set menu_color_normal=white/black
 set menu_color_highlight=black/light-gray
 
-set timeout=10
-set default=0
+#set timeout=0
+#set default=0
 set isofile="/cache/<%= @iso_name %>"
 
-menuentry "ii-usb automated install" {
+# -- automatic-ubiquity # maybe-ubiquity 
+menuentry "ii-usb Boot Persistent Ubuntu" {
+  loopback loop $isofile
+	set gfxpayload=keep
+	linux	(loop)/casper/vmlinuz splash quiet noprompt noeject debug-ubiquity boot=casper iso-scan/filename=$isofile locale=en_US nox2apic persistent  preseed/early_command=/root/isodevice/initramfs-persistent_command.sh
+	initrd	(loop)/casper/initrd.lz
+}
+
+menuentry "ii-usb Install Ubuntu to First Harddrive with Ubiquity" {
   loopback loop $isofile
 	set gfxpayload=keep
 	linux	(loop)/casper/vmlinuz splash quiet noprompt noeject debug-ubiquity boot=casper iso-scan/filename=$isofile file=/isodevice/preseed.seed locale=en_US nox2apic -- automatic-ubiquity # maybe-ubiquity 
 	initrd	(loop)/casper/initrd.lz
 }
-
-# automatic-oem-config
-# menuentry "Fully Automated OEM Laptop install to Disk" {
-#   loopback loop $isofile
-# 	set gfxpayload=keep
-# 	linux	(loop)/casper/vmlinuz splash quiet noprompt noeject automatic-ubiquity debug-ubiquity automatic-oem-config boot=casper iso-scan/filename=$isofile file=/isodevice/preseed.seed locale=en_US --
-# 	initrd	(loop)/casper/initrd.lz
-# }
-
-
-# preseed/locale=en_US 
-# keyboard-configuration/layoutcode=us
-# console-setup/layoutcode=en 
-
-menuentry "Live Laptop on USB" {
- loopback loop $isofile
- linux (loop)/casper/vmlinuz boot=casper iso-scan/filename=$isofile splash nox2apic --
- initrd (loop)/casper/initrd.lz
-}
-
-menuentry "Try Ubuntu without installing" {
-  loopback loop $isofile
-	set gfxpayload=keep
-	linux	(loop)/casper/vmlinuz boot=casper iso-scan/filename=$isofile file=/isodevice/preseed.seed quiet splash nox2apic --
-	initrd	(loop)/casper/initrd.lz
-}
-
