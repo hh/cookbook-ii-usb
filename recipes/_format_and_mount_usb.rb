@@ -20,8 +20,11 @@ bash "partition and format #{node['ii-usb']['target-device']}" do
   code <<-eoc
     parted -s ${USB} mklabel msdos 
     parted -s -- ${USB} mkpart primary fat32 2 #{node['ii-usb']['partition-size']}
+    # the rest of the USB is for persistent
+    parted -s -- ${USB} mkpart primary ext3 #{node['ii-usb']['partition-size']} -1
     parted -s -- ${USB} set 1 boot on
     mkfs.vfat -n '#{node['ii-usb']['volume-name']}' ${USB}1
+    mkfs.ext3 -m 0 -b 4096 -L casper-rw ${USB}2
   eoc
   environment({
       'USB' => node['ii-usb']['target-device']
