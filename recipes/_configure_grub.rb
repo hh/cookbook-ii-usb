@@ -7,6 +7,8 @@ template "#{usb}/boot/grub/grub.cfg" do
     })
 end
 
+package 'grub-pc-bin'
+
 # efi 
 
 template "#{usb}/boot/grub/x86_64-efi/grub.cfg" do
